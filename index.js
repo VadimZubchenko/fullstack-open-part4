@@ -1,11 +1,13 @@
-const express = require('express')
-const app = express()
-const PORT = 3001
+const app = require('./app')
+const config = require('./utils/config')
+const { info, error } = require('./utils/logger')
+const blogsRouter = require('./controllers/blogs')
 
-// Middleware for parsing JSON
-app.use(express.json())
+app.listen(config.PORT, () => {
+  info(`Server starting on http://localhost:${config.PORT}`)
+})
 
-let data = [
+/* let data = [
   {
     id: '1',
     data: 'HTML is easy',
@@ -35,21 +37,4 @@ app.post('/api/data', (req, res) => {
   const newData = req.body
   res.json({ message: 'Data has been added.', data: data.push(newData) })
 })
-
-app.listen(PORT, () => {
-  console.log(`Server starting on http://localhost:${PORT}`)
-})
-
-/* const http = require('http')
-
-// create server
-const server = http.createServer((req, resp) => {
-  resp.writeHead(200, { 'Content-ype': 'text/plain' })
-  resp.end('Hello from server')
-})
-
-// set PORT number and start the server
-const PORT = 3001
-server.listen(PORT, () => {
-  console.log('Server starting on port: ', PORT)
-}) */
+ */
