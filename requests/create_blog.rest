@@ -1,0 +1,11 @@
+POST http://localhost:3003/api/blogs 
+Content-Type: application/json
+
+{
+  
+  "title": "New title about JS closers",
+  "author": "Mika Puu",
+  "url": "https://test_two.fi/closers",
+  "votes": 22
+  
+}
