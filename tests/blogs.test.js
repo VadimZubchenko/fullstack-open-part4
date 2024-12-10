@@ -99,3 +99,12 @@ describe('the largest list of blogs', () => {
     assert.deepStrictEqual(author, { author: 'Robert C. Martin', blogs: 3 })
   })
 })
+describe('the most favorite author', () => {
+  test('find an author with max likes', () => {
+    const author = listHelper.maxLikesAuthor(blogs)
+    assert.deepStrictEqual(author, {
+      author: 'Edsger W. Dijkstra',
+      likes: 17,
+    })
+  })
+})
