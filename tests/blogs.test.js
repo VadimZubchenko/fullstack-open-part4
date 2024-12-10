@@ -49,7 +49,7 @@ const blogs = [
     title: 'First class tests',
     author: 'Robert C. Martin',
     url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
-    likes: 10,
+    likes: 12,
     __v: 0,
   },
   {
@@ -82,15 +82,20 @@ describe('total likes', () => {
 
   test('calculate sum of all blogs likes', () => {
     const result = listHelper.totalLikes(blogs)
-    assert.strictEqual(result, 36)
+    assert.strictEqual(result, 38)
   })
 })
 
 describe('the largest amount of likes', () => {
   test('find a blog with max amount of likes', () => {
     const favoriteBlog = listHelper.maxLikes(blogs)
-    console.log('favorite blog: ', favoriteBlog)
-
     assert.strictEqual(favoriteBlog, blogs[2])
+  })
+})
+
+describe('the largest list of blogs', () => {
+  test('find an author with max blogs', () => {
+    const author = listHelper.maxBlogsAuthor(blogs)
+    assert.deepStrictEqual(author, { author: 'Robert C. Martin', blogs: 3 })
   })
 })
