@@ -37,14 +37,14 @@ const maxLikesAuthor = (blogs) => {
   const groupedBlogs = _.groupBy(blogs, 'author')
   console.log('groupeBlogs ', groupedBlogs)
 
-  // Count blogs for each author
+  // Calculate total likes for each author
   const authorLikesCounts = _.map(groupedBlogs, (blogs, author) => ({
     author,
     likes: _.sumBy(blogs, 'likes'),
   }))
-  console.log('authors with likes ', authorLikesCounts)
+  console.log('authors / total likes: ', authorLikesCounts)
 
-  // Find author with most likes
+  // Find the author with the most likes
   const mostLikeAuthor = _.maxBy(authorLikesCounts, (blog) => blog.likes)
   console.log('max blogs :', mostLikeAuthor)
 

@@ -1,17 +1,13 @@
 // Create server as an app
 const express = require('express')
 const app = express()
-
 // Create routers
 const blogsRouter = require('./controllers/blogs')
-
 // Use middleware for logging
 const requestLogger = require('./utils/middleware').requestLogger
-
 // Take parameters and mongoose for MongoDB connection
 const config = require('./utils/config')
 const mongoose = require('mongoose')
-
 // Print info on consol
 const { info, error } = require('./utils/logger')
 
