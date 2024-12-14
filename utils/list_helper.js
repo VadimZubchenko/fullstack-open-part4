@@ -28,25 +28,21 @@ const maxBlogsAuthor = (blogs) => {
   }))
   // Find author with max blogs
   const mostBlogAuthor = _.maxBy(authorBlogCounts, 'blogs')
-  console.log('max blogs :', mostBlogAuthor)
 
   return mostBlogAuthor
 }
 const maxLikesAuthor = (blogs) => {
   // Group blogs by author's name
   const groupedBlogs = _.groupBy(blogs, 'author')
-  console.log('groupeBlogs ', groupedBlogs)
 
   // Calculate total likes for each author
   const authorLikesCounts = _.map(groupedBlogs, (blogs, author) => ({
     author,
     likes: _.sumBy(blogs, 'likes'),
   }))
-  console.log('authors / total likes: ', authorLikesCounts)
 
   // Find the author with the most likes
   const mostLikeAuthor = _.maxBy(authorLikesCounts, (blog) => blog.likes)
-  console.log('max blogs :', mostLikeAuthor)
 
   return mostLikeAuthor
 }
