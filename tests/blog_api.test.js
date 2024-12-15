@@ -37,7 +37,7 @@ test('the first blog is about HTTP methods', async () => {
   assert(title.includes('React patterns'))
 })
 
-test.only('the certain blog with id', async () => {
+test('the certain blog with id', async () => {
   const allBlogs = await helper.blogsInDB()
   const firstBlog = allBlogs[0]
 
@@ -47,6 +47,29 @@ test.only('the certain blog with id', async () => {
     .expect('Content-Type', /application\/json/)
 
   assert.deepStrictEqual(resultBlog.body, firstBlog)
+})
+
+test('add the new blog and check it', async () => {
+  const newBlog = {
+    title: 'How to create DB on Mongo Atlas',
+    author: 'Johny Cash',
+    url: 'https://johny.cash.com/mongoAtlas',
+    likes: 101,
+  }
+
+  await api
+    .post('/api/blogs/')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const updatedBlogs = await api.get('/api/blogs')
+
+  const titles = updatedBlogs.body.map((e) => e.title)
+  // check if DB length get the new block
+  assert.strictEqual(updatedBlogs.body.length, helper.initialBlogs.length + 1)
+  // check if the new blog is added the DB
+  assert(titles.includes(newBlog.title))
 })
 
 after(async () => {
