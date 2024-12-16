@@ -16,23 +16,29 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.post('/', (request, response) => {
-  if (request.body.likes !== null) {
-    const blog = new Blog(request.body)
-    blog.save().then((result) => {
-      response.status(201).json(result)
-    })
-  } else {
-    const defaultLike = {
-      title: request.body.title,
-      author: request.body.author,
-      url: request.body.url,
-      likes: 0,
-    }
-    const blog = new Blog(defaultLike)
-    blog.save().then((result) => {
-      response.status(201).json(result)
-    })
+  const { title, author, url, likes } = request.body
+
+  // Validate required fields
+  if (!title || !url) {
+    return response.status(400).json({ error: 'Title and URL are required' })
   }
+
+  // Create the blog with a default value for likes if not provided
+  const blog = new Blog({
+    title,
+    author,
+    url,
+    likes: likes || 0, // Default to 0 if likes is not provided
+  })
+
+  blog
+    .save()
+    .then((savedBlog) => {
+      response.status(201).json(savedBlog)
+    })
+    .catch((error) => {
+      response.status(500).json({ error: 'Failed to save the blog' })
+    })
 })
 
 module.exports = blogsRouter

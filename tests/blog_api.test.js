@@ -72,7 +72,7 @@ test('add the new blog and check it', async () => {
   assert(titles.includes(newBlog.title))
 })
 
-test.only('add a blog without liking', async () => {
+test('add a blog with empty field of likes', async () => {
   const blogWithoutLikes = {
     title: 'The most populared JavaScript framework',
     author: 'Albert Oldman',
@@ -89,7 +89,38 @@ test.only('add a blog without liking', async () => {
   // check if added blog has likes: 0
   assert.strictEqual(likes[likes.length - 1], 0)
 })
+test('add a blog with empty field of title, link or both', async () => {
+  // Creating blogs with all possible missing fields cases
+  const blogsWithoutRequiredFields = [
+    {
+      title: null, // Missing title
+      author: 'Albert Oldman',
+      url: 'http://example.com',
+      likes: 707,
+    },
+    {
+      title: 'A Title',
+      author: 'Albert Oldman',
+      url: null, // Missing url
+      likes: 707,
+    },
+    {
+      author: 'Albert Oldman', // Both title and url missing
+      likes: 707,
+    },
+  ]
+  // Map through each invalid blog, sending a POST request and expecting 400
+  await Promise.all(
+    blogsWithoutRequiredFields.map((invalidBlog) =>
+      api.post('/api/blogs').send(invalidBlog).expect(400)
+    )
+  )
 
+  // Verify the number of blogs in the database hasn't beend changed
+  const result = await api.get('/api/blogs')
+
+  assert.strictEqual(result.body.length, helper.initialBlogs.length)
+})
 after(async () => {
   await mongoose.connection.close()
 })
