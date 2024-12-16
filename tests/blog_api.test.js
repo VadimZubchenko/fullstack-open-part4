@@ -72,6 +72,24 @@ test('add the new blog and check it', async () => {
   assert(titles.includes(newBlog.title))
 })
 
+test.only('add a blog without liking', async () => {
+  const blogWithoutLikes = {
+    title: 'The most populared JavaScript framework',
+    author: 'Albert Oldman',
+    url: 'http://www.javascripttutorial.com/albert.oldman/framework',
+    likes: null,
+  }
+  // add a blog with likes: null
+  await api.post('/api/blogs').send(blogWithoutLikes).expect(201)
+  // get the blog
+  const result = await api.get('/api/blogs')
+  // destrict likes of all blogs
+  const likes = result.body.map((e) => e.likes)
+
+  // check if added blog has likes: 0
+  assert.strictEqual(likes[likes.length - 1], 0)
+})
+
 after(async () => {
   await mongoose.connection.close()
 })

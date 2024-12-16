@@ -16,10 +16,23 @@ blogsRouter.get('/:id', async (request, response) => {
 })
 
 blogsRouter.post('/', (request, response) => {
-  const blog = new Blog(request.body)
-  blog.save().then((result) => {
-    response.status(201).json(result)
-  })
+  if (request.body.likes !== null) {
+    const blog = new Blog(request.body)
+    blog.save().then((result) => {
+      response.status(201).json(result)
+    })
+  } else {
+    const defaultLike = {
+      title: request.body.title,
+      author: request.body.author,
+      url: request.body.url,
+      likes: 0,
+    }
+    const blog = new Blog(defaultLike)
+    blog.save().then((result) => {
+      response.status(201).json(result)
+    })
+  }
 })
 
 module.exports = blogsRouter
