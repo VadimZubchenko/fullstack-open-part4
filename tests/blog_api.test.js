@@ -8,7 +8,7 @@ const api = supertest(app)
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
 
-describe.only('when DB has already saved blogs', () => {
+describe('when DB has already saved blogs', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
@@ -155,6 +155,24 @@ describe.only('when DB has already saved blogs', () => {
       assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
       const titles = blogsAtEnd.map((r) => r.title)
       assert(!titles.includes(blogToDelete.title))
+    })
+  })
+  describe('update blog by id', () => {
+    test('update amount of likes of certain blog', async () => {
+      // get specific blog id from DB
+      const blogs = await helper.blogsInDB()
+      const id = blogs[0].id
+
+      const updatedBlog = {
+        likes: 122,
+      }
+
+      const response = await api
+        .put(`/api/blogs/${id}`)
+        .send(updatedBlog)
+        .expect(200)
+
+      assert.strictEqual(response.body.likes, updatedBlog.likes)
     })
   })
 })
