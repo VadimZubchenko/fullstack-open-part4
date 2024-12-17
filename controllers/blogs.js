@@ -1,5 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const mongoose = require('mongoose')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({})
@@ -7,11 +8,18 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.get('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id)
+  const { id } = request.params
+  // Check if the ID is a valid MongoDB ObjectId
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return response.status(400).json({ error: 'Invalid blog ID format' })
+  }
+
+  const blog = await Blog.findById(id)
+
   if (blog) {
     response.json(blog)
   } else {
-    response.status(404).end()
+    response.status(404).json({ error: 'Blog not found' })
   }
 })
 
@@ -39,6 +47,13 @@ blogsRouter.post('/', (request, response) => {
     .catch((error) => {
       response.status(500).json({ error: 'Failed to save the blog' })
     })
+})
+
+blogsRouter.delete('/:id', async (request, response) => {
+  const { id } = request.params
+
+  await Blog.findByIdAndDelete(id)
+  response.status(204).end()
 })
 
 module.exports = blogsRouter

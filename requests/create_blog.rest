@@ -3,9 +3,9 @@ Content-Type: application/json
 
 {
   
-  "title": "High-ordered function",
-  "author": "Well Wellberg",
+  "title": "To be delete soon",
+  "author": "Well Done",
   "url": "https://titles.com/javascript.tutorial",
-  "likes": null
+  "likes": 101
   
 }
