@@ -27,6 +27,7 @@ const nonExistingBlog = async () => {
 
 const blogsInDB = async () => {
   const blogs = await Blog.find({})
+  // here toJSON() uses an overrided vesion in models/blog.js
   return blogs.map((blog) => blog.toJSON())
 }
 

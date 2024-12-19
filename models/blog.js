@@ -6,9 +6,9 @@ const blogSchema = new mongoose.Schema({
   url: String,
   likes: Number,
 })
-
-// transform returned DB JSON to cleaner format by deleting '_id' and '_v' (version of doc, autom-lly added by Mongoose )
+// Overrides the default toJSON behavior for Mongoose documents when toJSON() is called
 blogSchema.set('toJSON', {
+  // transform returned DB JSON to cleaner format by deleting '_id' and '_v' (version of doc, autom-lly added by Mongoose )
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
