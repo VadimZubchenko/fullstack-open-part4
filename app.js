@@ -1,6 +1,8 @@
 // Create server as an app
 const express = require('express')
 const app = express()
+// patches the Express router to automatically catch
+// no longer need try...catch blocks in asynchronous route handlers.
 require('express-async-errors')
 // Create routers
 const blogsRouter = require('./controllers/blogs')
@@ -36,8 +38,8 @@ mongoose
 
 app.use(express.json())
 app.use(requestLogger)
+app.use(errorHandler)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
-app.use(errorHandler)
 
 module.exports = app

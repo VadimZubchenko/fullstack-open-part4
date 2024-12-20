@@ -1,9 +1,10 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const mongoose = require('mongoose')
+const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   response.json(blogs)
 })
 
@@ -23,13 +24,16 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-blogsRouter.post('/', (request, response) => {
-  const { title, author, url, likes } = request.body
+blogsRouter.post('/', async (request, response) => {
+  const { title, author, url, likes, userId } = request.body
 
   // Validate required fields
   if (!title || !url) {
     return response.status(400).json({ error: 'Title and URL are required' })
   }
+  console.log('user:', userId)
+  const user = await User.findById(userId)
+  console.log('user: ', user)
 
   // Create the blog with a default value for likes if not provided
   const blog = new Blog({
@@ -37,16 +41,12 @@ blogsRouter.post('/', (request, response) => {
     author,
     url,
     likes: likes || 0, // Default to 0 if likes is not provided
+    user: user._id,
   })
-
-  blog
-    .save()
-    .then((savedBlog) => {
-      response.status(201).json(savedBlog)
-    })
-    .catch((error) => {
-      response.status(500).json({ error: 'Failed to save the blog' })
-    })
+  const savedBlog = await blog.save()
+  user.blogs = user.blogs.concat(savedBlog._id)
+  await user.save()
+  response.json(savedBlog)
 })
 
 blogsRouter.put('/:id', async (request, response) => {
