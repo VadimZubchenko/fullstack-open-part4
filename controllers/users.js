@@ -1,17 +1,17 @@
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
-const mongoose = require('mongoose')
-const { response } = require('../app')
 
 usersRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body
 
-  if (!username || !password) {
+  // Validate raw password length before hash
+  if (!password || password.length < 3) {
     return response
-      .status(401)
-      .json({ error: 'username and password are required' })
+      .status(400)
+      .json({ error: 'Password must be at least 3 characters long' })
   }
+
   const saltRound = 10
   const passwordHash = await bcrypt.hash(password, saltRound)
 

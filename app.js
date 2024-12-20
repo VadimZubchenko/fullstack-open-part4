@@ -1,11 +1,15 @@
 // Create server as an app
 const express = require('express')
 const app = express()
+require('express-async-errors')
 // Create routers
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
+
 // Use middleware for logging
 const requestLogger = require('./utils/middleware').requestLogger
+const errorHandler = require('./utils/middleware').errorHandler
+
 // Take parameters and mongoose for MongoDB connection
 const config = require('./utils/config')
 const mongoose = require('mongoose')
@@ -34,5 +38,6 @@ app.use(express.json())
 app.use(requestLogger)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
+app.use(errorHandler)
 
 module.exports = app
