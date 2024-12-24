@@ -12,6 +12,7 @@ const loginRouter = require('./controllers/login')
 // Use middleware for logging
 const requestLogger = require('./utils/middleware').requestLogger
 const errorHandler = require('./utils/middleware').errorHandler
+const tokenExtractor = require('./utils/middleware').tokenExtractor
 
 // Take parameters and mongoose for MongoDB connection
 const config = require('./utils/config')
@@ -39,6 +40,7 @@ mongoose
 
 app.use(express.json())
 app.use(requestLogger)
+app.use(tokenExtractor)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
