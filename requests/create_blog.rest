@@ -1,12 +1,12 @@
 POST http://localhost:3003/api/blogs 
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoic2FudG9iIiwiaWQiOiI2NzZhOTFjNzdiYTVmMjgyZmIwYzAwMTMiLCJpYXQiOjE3MzUwNDcwNjl9.QqYebWfkwPfljaGVbqZEUd_A6b4CqxvoswNqIkKCYnw
 
 {
   
-  "title": "Second title",
+  "title": "",
   "author": "Dr. Juan B. Rodriges",
   "url": "https://blackholesII.com",
-  "likes": 10,
-  "userId": "676590a2dccb8c3172399afe"
-  
+  "likes": 101
+ 
 }

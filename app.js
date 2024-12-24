@@ -39,9 +39,11 @@ mongoose
 
 app.use(express.json())
 app.use(requestLogger)
-app.use(errorHandler)
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+
+// Error-handling middleware (must come last)
+app.use(errorHandler)
 
 module.exports = app
