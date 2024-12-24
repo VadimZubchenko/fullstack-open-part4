@@ -71,8 +71,28 @@ blogsRouter.put('/:id', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   const { id } = request.params
+  // Find the blog by ID
+  const blog = await Blog.findById(id)
 
-  await Blog.findByIdAndDelete(id)
+  // If the blog is not found
+  if (!blog) {
+    return response.status(404).json({ error: `Blog with id: ${id} not found` })
+  }
+
+  //check out user from token
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  // If token not valid
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token not valid' })
+  }
+  // Check if the user is the author of the blog
+  if (decodedToken.id !== blog.user.toString()) {
+    response
+      .status(403)
+      .json({ error: 'You don not have permission to delete this blog' })
+  }
+  // Delete blog
+  await blog.deleteOne()
   response.status(204).end()
 })
 
