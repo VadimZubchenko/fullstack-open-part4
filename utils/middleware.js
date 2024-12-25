@@ -34,9 +34,13 @@ const tokenExtractor = (request, response, next) => {
 }
 
 const userExtractor = (request, response, next) => {
+  if (!request.token) {
+    return response.status(401).json({ error: 'invalid token' })
+  }
   //check out user from token
   const decodedToken = jwt.verify(request.token, process.env.SECRET)
   request.user = decodedToken
+
   next()
 }
 

@@ -30,6 +30,7 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
 
   // get user from request object
   const user = request.user
+
   // If token not valid
   if (!user) {
     return response.status(401).json({ error: 'token not valid' })

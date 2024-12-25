@@ -7,6 +7,7 @@ const api = supertest(app)
 
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 describe('when DB has already saved blogs', () => {
   beforeEach(async () => {
@@ -65,6 +66,11 @@ describe('when DB has already saved blogs', () => {
 
   describe('addition of a new blog', () => {
     test('add the new blog and check it', async () => {
+      const user = {
+        username: 'usrtest',
+        password: 'test_test!',
+      }
+
       const newBlog = {
         title: 'How to create DB on Mongo Atlas',
         author: 'Johny Cash',
@@ -72,10 +78,15 @@ describe('when DB has already saved blogs', () => {
         likes: 101,
       }
 
+      // Get token after user login
+      const response = await api.post('/api/login/').send(user)
+      const token = response.body.token
+
       await api
         .post('/api/blogs/')
         .send(newBlog)
-        .expect(201)
+        .set({ Authorization: `Bearer ${token}` })
+        .expect(200)
         .expect('Content-Type', /application\/json/)
 
       const updatedBlogs = await api.get('/api/blogs')
@@ -89,6 +100,28 @@ describe('when DB has already saved blogs', () => {
       // check if the new blog is added the DB
       assert(titles.includes(newBlog.title))
     })
+    test('fails with status code 401 if token is not provided', async () => {
+      const newBlog = {
+        title: 'How to create DB on Mongo Atlas',
+        author: 'Johny Cash',
+        url: 'https://johny.cash.com/mongoAtlas',
+        likes: 101,
+      }
+
+      // Lähetetään POST-pyyntö ilman Authorization-headeria
+      const response = await api
+        .post('/api/blogs/')
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+
+      // Varmistetaan virheilmoituksen sisältö
+      assert.strictEqual(response.body.error, 'invalid token')
+
+      // Varmistetaan, ettei blogeja lisätty
+      const blogsAtEnd = await helper.blogsInDB()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
+    })
 
     test('add a blog with empty field of likes', async () => {
       const blogWithoutLikes = {
@@ -97,8 +130,21 @@ describe('when DB has already saved blogs', () => {
         url: 'http://www.javascripttutorial.com/albert.oldman/framework',
         likes: null,
       }
+
+      const user = {
+        username: 'usrtest',
+        password: 'test_test!',
+      }
+      // Get token after user login
+      const response = await api.post('/api/login/').send(user)
+      const token = response.body.token
+
       // add a blog with likes: null
-      await api.post('/api/blogs').send(blogWithoutLikes).expect(201)
+      await api
+        .post('/api/blogs')
+        .send(blogWithoutLikes)
+        .set({ Authorization: `Bearer ${token}` })
+        .expect(200)
       // get the blog
       const result = await api.get('/api/blogs')
       // destrict likes of all blogs
@@ -128,10 +174,23 @@ describe('when DB has already saved blogs', () => {
           likes: 707,
         },
       ]
+
+      const user = {
+        username: 'usrtest',
+        password: 'test_test!',
+      }
+      // Get token after user login
+      const response = await api.post('/api/login/').send(user)
+      const token = response.body.token
+
       // Map through each invalid blog, sending a POST request and expecting 400
       await Promise.all(
         blogsWithoutRequiredFields.map((invalidBlog) =>
-          api.post('/api/blogs').send(invalidBlog).expect(400)
+          api
+            .post('/api/blogs')
+            .send(invalidBlog)
+            .set({ Authorization: `Bearer ${token}` })
+            .expect(400)
         )
       )
 
@@ -146,7 +205,27 @@ describe('when DB has already saved blogs', () => {
       const blogsAtStart = await helper.blogsInDB()
       const blogToDelete = blogsAtStart[0]
 
-      const response = await api.delete(`/api/blogs/${blogToDelete.id}`)
+      const user = {
+        username: 'usrtest',
+        password: 'test_test!',
+      }
+      // Get token after user login
+      const resp = await api.post('/api/login/').send(user)
+      const token = resp.body.token
+
+      // Get user id from DB
+      const usr = await User.findOne(resp.body._id)
+      const usrID = usr._id.toString()
+
+      // Find blog and add user id to it
+      const blog = await Blog.findById(blogToDelete.id)
+      blog.user = usrID
+      await blog.save()
+
+      const response = await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set({ Authorization: `Bearer ${token}` })
+        .expect(204)
 
       const blogsAtEnd = await helper.blogsInDB()
       // Check status code 204
@@ -167,9 +246,18 @@ describe('when DB has already saved blogs', () => {
         likes: 122,
       }
 
+      const user = {
+        username: 'usrtest',
+        password: 'test_test!',
+      }
+      // Get token after user login
+      const resp = await api.post('/api/login/').send(user)
+      const token = resp.body.token
+
       const response = await api
         .put(`/api/blogs/${id}`)
         .send(updatedBlog)
+        .set({ Authorization: `Bearer ${token}` })
         .expect(200)
 
       assert.strictEqual(response.body.likes, updatedBlog.likes)
