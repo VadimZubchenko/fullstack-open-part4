@@ -41,6 +41,7 @@ mongoose
 app.use(express.json())
 app.use(requestLogger)
 app.use(tokenExtractor)
+
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)

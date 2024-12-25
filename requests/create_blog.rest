@@ -1,12 +1,12 @@
 POST http://localhost:3003/api/blogs 
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoic2FudG9iIiwiaWQiOiI2NzZhOTFjNzdiYTVmMjgyZmIwYzAwMTMiLCJpYXQiOjE3MzUwNDcwNjl9.QqYebWfkwPfljaGVbqZEUd_A6b4CqxvoswNqIkKCYnw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoic2FudG9iIiwiaWQiOiI2NzZhYmRmZmIxNGRmYTM5MmNlYWRiOTAiLCJpYXQiOjE3MzUwNDk3OTl9.uFO_DZoDb1RIdn4t8u4gpfukQPj5Xg1MOYsTtA37N2o
 
 {
   
-  "title": "",
+  "title": "Third blog added",
   "author": "Dr. Juan B. Rodriges",
-  "url": "https://blackholesII.com",
-  "likes": 101
+  "url": "https://strange/love/happen.eu",
+  "likes": 999
  
 }

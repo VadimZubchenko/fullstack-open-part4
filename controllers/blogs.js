@@ -2,7 +2,7 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const mongoose = require('mongoose')
 const User = require('../models/user')
-const jwt = require('jsonwebtoken')
+const userExtractor = require('../utils/middleware').userExtractor
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -25,20 +25,23 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', userExtractor, async (request, response) => {
   const { title, author, url, likes } = request.body
 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-  if (!decodedToken.id) {
+  // get user from request object
+  const user = request.user
+  // If token not valid
+  if (!user) {
     return response.status(401).json({ error: 'token not valid' })
   }
+
+  // find user from DB with list of blogs
+  const userDB = await User.findById(user.id)
 
   // Validate required fields
   if (!title || !url) {
     return response.status(400).json({ error: 'Title and URL are required' })
   }
-  const user = await User.findById(decodedToken.id)
 
   // Create the blog with a default value for likes if not provided
   const blog = new Blog({
@@ -46,11 +49,11 @@ blogsRouter.post('/', async (request, response) => {
     author,
     url,
     likes: likes || 0, // Default to 0 if likes is not provided
-    user: user._id,
+    user: userDB._id,
   })
   const savedBlog = await blog.save()
-  user.blogs = user.blogs.concat(savedBlog._id)
-  await user.save()
+  userDB.blogs = userDB.blogs.concat(savedBlog.id)
+  await userDB.save()
   response.json(savedBlog)
 })
 
@@ -69,7 +72,7 @@ blogsRouter.put('/:id', async (request, response) => {
   response.json(updatedBlog)
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
+blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   const { id } = request.params
   // Find the blog by ID
   const blog = await Blog.findById(id)
@@ -79,18 +82,20 @@ blogsRouter.delete('/:id', async (request, response) => {
     return response.status(404).json({ error: `Blog with id: ${id} not found` })
   }
 
-  //check out user from token
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  // get user from request object
+  const user = request.user
   // If token not valid
-  if (!decodedToken.id) {
+  if (!user) {
     return response.status(401).json({ error: 'token not valid' })
   }
+
   // Check if the user is the author of the blog
-  if (decodedToken.id !== blog.user.toString()) {
+  if (user.id !== blog.user.toString()) {
     response
       .status(403)
       .json({ error: 'You don not have permission to delete this blog' })
   }
+
   // Delete blog
   await blog.deleteOne()
   response.status(204).end()
